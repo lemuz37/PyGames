@@ -15,8 +15,8 @@ clock = pygame.time.Clock()
 
 #Set game values
 PLAYER_STARTING_LIVES = 5
-PLAYER_VELOCITY = 5
-COIN_STARTING_VELOCITY = 5
+PLAYER_VELOCITY = 10
+COIN_STARTING_VELOCITY = 10
 COIN_ACCELERATION = .5
 BUFFER_DISTANCE = 100
 
@@ -78,6 +78,7 @@ coin_rect.y = random.randint(64, WINDOW_HEIGHT - 32)
 
 
 #The main loop
+pygame.mixer.music.play(-1, 0.0)
 running = True
 
 while running:
@@ -86,6 +87,63 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    #Get a list of all keys currently being pressed on
+    keys = pygame.key.get_pressed()
+
+    #Move the dragon continuously
+    if (keys[pygame.K_LEFT] or keys[pygame.K_a]) and player_rect.left > 0:
+        player_rect.x -= PLAYER_VELOCITY
+    if (keys[pygame.K_RIGHT] or keys[pygame.K_d]) and player_rect.right < WINDOW_WIDTH:
+        player_rect.x += PLAYER_VELOCITY
+    if (keys[pygame.K_UP] or keys[pygame.K_w]) and player_rect.top > 64:
+        player_rect.y -= PLAYER_VELOCITY
+    if (keys[pygame.K_DOWN] or keys[pygame.K_s]) and player_rect.bottom < WINDOW_HEIGHT:
+        player_rect.y += PLAYER_VELOCITY
+
+    #Move the coin
+    if coin_rect.x < 0:
+        player_lives -= 1
+        miss_sound.play()
+        coin_rect.x = WINDOW_WIDTH + BUFFER_DISTANCE
+        coin_rect.y = random.randint(64, WINDOW_HEIGHT - 32)
+    else:
+        #Move the coin
+        coin_rect.x -= coin_velocity
+
+    #Check for collisions
+    if player_rect.colliderect(coin_rect):
+        score += 1
+        coin_sound.play()
+        coin_velocity += COIN_ACCELERATION
+        coin_rect.x = WINDOW_WIDTH + BUFFER_DISTANCE
+        coin_rect.y = random.randint(64, WINDOW_HEIGHT - 32)
+
+    #Update HUD
+    score_text = font.render("Score: " + str(score), True, GREEN, DARKGREEN)
+    lives_text = font.render("Lives: " + str(player_lives), True, GREEN, DARKGREEN)
+
+    #Check for game over
+    if player_lives == 0:
+        display_surface.blit(game_over_text, game_over_rect)
+        display_surface.blit(continue_text, continue_rect)
+        pygame.display.update()
+
+        #Pause the game until the player presses a key, then reset game
+        pygame.mixer.music.stop()
+        is_paused = True
+        while is_paused:
+                #Check to see if user wants to quit
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    score = 0
+                    player_lives = PLAYER_STARTING_LIVES
+                    player_rect.y = WINDOW_HEIGHT//2
+                    coin_velocity = COIN_STARTING_VELOCITY
+                    pygame.mixer.music.play(-1, 0.0)
+                    is_paused = False
+                if event.type == pygame.QUIT:
+                    is_paused = False
+                    running = False
 
     #Fill the display
     display_surface.fill(BLACK)

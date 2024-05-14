@@ -75,11 +75,11 @@ for font in fonts:
 # dragon_left_rect = dragon_left_image.get_rect()
 # dragon_left_rect.topleft = (0, 0)
 
-dragon_right_image = pygame.image.load("dragon_right.png")
+dragon_right_image = pygame.image.load("Practice\dragon_right.png")
 dragon_right_rect = dragon_right_image.get_rect()
 dragon_right_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
 
-coin_image = pygame.image.load('coin.png')
+coin_image = pygame.image.load('Practice\coin.png')
 coin_rect = coin_image.get_rect()
 coin_rect.center = (WINDOW_WIDTH//2 - 200, WINDOW_HEIGHT//2)
 
