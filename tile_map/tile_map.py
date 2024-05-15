@@ -174,8 +174,6 @@ class Player(pygame.sprite.Sprite):
 
         self.image = sprite_list[int(self.current_sprite)]
 
-    
-
 
 
 #Create a sprite group
